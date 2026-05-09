@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { X, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,6 +12,22 @@ interface ProjectSidebarProps {
 }
 
 export function ProjectSidebar({ isOpen, onClose }: ProjectSidebarProps) {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("keydown", handleKeyDown);
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return (
@@ -19,13 +36,21 @@ export function ProjectSidebar({ isOpen, onClose }: ProjectSidebarProps) {
       <div
         className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40"
         onClick={onClose}
+        aria-hidden="true"
       />
 
       {/* Sidebar */}
-      <aside className="fixed top-0 left-0 bottom-0 w-80 bg-card border-r border-border z-50 flex flex-col animate-in slide-in-from-left duration-300">
+      <aside
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="projects-dialog-title"
+        className="fixed top-0 left-0 bottom-0 w-80 bg-card border-r border-border z-50 flex flex-col animate-in slide-in-from-left duration-300"
+      >
         {/* Header */}
         <div className="h-14 flex items-center justify-between px-4 border-b border-border">
-          <h2 className="text-lg font-semibold">Projects</h2>
+          <h2 id="projects-dialog-title" className="text-lg font-semibold">
+            Projects
+          </h2>
           <Button
             variant="ghost"
             size="icon"
